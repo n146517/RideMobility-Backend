@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RideMobility.Api.Data;
 using RideMobility.Api.Models;
+using RideMobility.Api.Repositories.Interfaces;
 
 namespace RideMobility.Api.Controllers
 {
@@ -9,34 +9,35 @@ namespace RideMobility.Api.Controllers
     [ApiController]
     public class DriverController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IDriverRepository _driverRepo;
 
-        public DriverController(ApplicationDbContext context)
+        public DriverController(IDriverRepository driverRepo)
         {
-            _context = context;
+            _driverRepo = driverRepo;
         }
 
         // Get all drivers (Admin only)
         [HttpGet("all")]
         [Authorize(Roles = "Admin")]
-        public IActionResult GetDrivers() => Ok(_context.Drivers.ToList());
+        public async Task<IActionResult> GetDrivers() =>
+            Ok(await _driverRepo.GetAllAsync());
 
         // Get available drivers (Rider/Admin)
         [HttpGet("available")]
         [Authorize(Roles = "Rider,Admin")]
-        public IActionResult GetAvailableDrivers() =>
-            Ok(_context.Drivers.Where(d => d.IsAvailable).ToList());
+        public async Task<IActionResult> GetAvailableDrivers() =>
+            Ok(await _driverRepo.GetAvailableDriversAsync());
 
         // Add a driver (Admin only)
         [HttpPost("add")]
         [Authorize(Roles = "Admin")]
-        public IActionResult AddDriver([FromBody] Driver driver)
+        public async Task<IActionResult> AddDriver([FromBody] Driver driver)
         {
             if (string.IsNullOrWhiteSpace(driver.Name))
                 return BadRequest("Driver name is required");
 
-            _context.Drivers.Add(driver);
-            _context.SaveChanges();
+            await _driverRepo.AddAsync(driver);
+            await _driverRepo.SaveChangesAsync();
             return Ok(driver);
         }
     }

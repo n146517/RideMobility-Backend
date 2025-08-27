@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RideMobility.Api.Data;
 using RideMobility.Api.Models;
+using RideMobility.Api.Repositories.Interfaces;
 
 namespace RideMobility.Api.Controllers
 {
@@ -9,45 +9,39 @@ namespace RideMobility.Api.Controllers
     [ApiController]
     public class RideController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IRideRequestRepository _rideRepo;
 
-        public RideController(ApplicationDbContext context)
+        public RideController(IRideRequestRepository rideRepo)
         {
-            _context = context;
+            _rideRepo = rideRepo;
         }
 
         [HttpPost("request")]
         [Authorize(Roles = "Rider")]
-        public IActionResult CreateRide([FromBody] RideRequest ride)
+        public async Task<IActionResult> CreateRide([FromBody] RideRequest ride)
         {
             if (ride.RiderId <= 0) return BadRequest("RiderId required");
             if (string.IsNullOrWhiteSpace(ride.PickupLocation) || string.IsNullOrWhiteSpace(ride.DropLocation))
                 return BadRequest("Pickup and drop locations required");
             if (ride.DistanceKm <= 0) return BadRequest("Distance must be greater than 0");
 
-            var riderExists = _context.Users.Any(u => u.Id == ride.RiderId && u.Role == "Rider");
+            var riderExists = await _rideRepo.RiderExistsAsync(ride.RiderId);
             if (!riderExists) return NotFound("Rider not found");
 
-            _context.RideRequests.Add(ride);
-            _context.SaveChanges();
+            await _rideRepo.AddAsync(ride);
+            await _rideRepo.SaveChangesAsync();
+
             return Ok(ride);
         }
 
         [HttpGet("all")]
         [Authorize(Roles = "Admin")]
-        public IActionResult GetRides() => Ok(_context.RideRequests.ToList());
+        public async Task<IActionResult> GetRides() =>
+            Ok(await _rideRepo.GetAllAsync());
 
         [HttpGet("byrider/{riderId}")]
         [Authorize(Roles = "Rider,Admin")]
-        public IActionResult GetRidesByRider(int riderId, int page = 1, int pageSize = 10)
-        {
-            var rides = _context.RideRequests
-                .Where(r => r.RiderId == riderId)
-                .OrderByDescending(r => r.Id)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToList();
-            return Ok(rides);
-        }
+        public async Task<IActionResult> GetRidesByRider(int riderId, int page = 1, int pageSize = 10) =>
+            Ok(await _rideRepo.GetByRiderAsync(riderId, page, pageSize));
     }
 }

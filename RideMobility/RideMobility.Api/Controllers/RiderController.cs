@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using RideMobility.Api.Data;
+using RideMobility.Api.Repositories.Interfaces;
 
 namespace RideMobility.Api.Controllers
 {
@@ -8,17 +8,17 @@ namespace RideMobility.Api.Controllers
     [ApiController]
     public class RiderController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IRiderRepository _riderRepo;
 
-        public RiderController(ApplicationDbContext context)
+        public RiderController(IRiderRepository riderRepo)
         {
-            _context = context;
+            _riderRepo = riderRepo;
         }
 
         // Get all riders (Admin only)
         [HttpGet("all")]
         [Authorize(Roles = "Admin")]
-        public IActionResult GetRiders() =>
-            Ok(_context.Users.Where(u => u.Role == "Rider").ToList());
+        public async Task<IActionResult> GetRiders() =>
+            Ok(await _riderRepo.GetAllRidersAsync());
     }
 }
