@@ -1,16 +1,26 @@
+# Visual Studio / .NET
+.vs/
 bin/
 obj/
 *.user
 *.suo
 *.cache
 *.log
+
+# Docs / generated files
 *.zip
 *.pdf
+
+# IDE
 .vscode/
 .idea/
 *.swp
+
+# EF Migrations / Database
 Migrations/
 *.mdf
 *.ldf
+
+# OS generated
 .DS_Store
 Thumbs.db
