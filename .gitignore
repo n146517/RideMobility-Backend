@@ -1,0 +1,16 @@
+bin/
+obj/
+*.user
+*.suo
+*.cache
+*.log
+*.zip
+*.pdf
+.vscode/
+.idea/
+*.swp
+Migrations/
+*.mdf
+*.ldf
+.DS_Store
+Thumbs.db
