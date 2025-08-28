@@ -16,19 +16,16 @@ namespace RideMobility.Api.Controllers
             _driverRepo = driverRepo;
         }
 
-        // Get all drivers (Admin only)
         [HttpGet("all")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetDrivers() =>
             Ok(await _driverRepo.GetAllAsync());
 
-        // Get available drivers (Rider/Admin)
         [HttpGet("available")]
         [Authorize(Roles = "Rider,Admin")]
-        public async Task<IActionResult> GetAvailableDrivers() =>
-            Ok(await _driverRepo.GetAvailableDriversAsync());
+        public async Task<IActionResult> GetAvailableDrivers(VehicleType? vehicleType = null) =>
+            Ok(await _driverRepo.GetAvailableDriversAsync(vehicleType));
 
-        // Add a driver (Admin only)
         [HttpPost("add")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddDriver([FromBody] Driver driver)

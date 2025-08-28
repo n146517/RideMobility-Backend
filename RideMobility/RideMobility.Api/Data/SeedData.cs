@@ -22,8 +22,10 @@ namespace RideMobility.Api.Data
             if (!context.Drivers.Any())
             {
                 context.Drivers.AddRange(
-                    new Driver { Name = "Driver One", IsAvailable = true },
-                    new Driver { Name = "Driver Two", IsAvailable = true }
+                    new Driver { Name = "Driver One", IsAvailable = true, VehicleType = VehicleType.Car },
+                    new Driver { Name = "Driver Two", IsAvailable = true, VehicleType = VehicleType.Taxi },
+                    new Driver { Name = "Driver Three", IsAvailable = true, VehicleType = VehicleType.ERiksha },
+                    new Driver { Name = "Driver Four", IsAvailable = true, VehicleType = VehicleType.Auto }
                 );
                 context.SaveChanges();
             }

@@ -11,5 +11,8 @@ namespace RideMobility.Api.Models
         public string Name { get; set; } = string.Empty;
 
         public bool IsAvailable { get; set; } = true;
+
+        [Required]
+        public VehicleType VehicleType { get; set; } = VehicleType.Car;
     }
 }

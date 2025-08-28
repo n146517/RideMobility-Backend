@@ -17,20 +17,20 @@ namespace RideMobility.Api.Repositories.Implementations
         public async Task<Booking?> GetByIdAsync(int bookingId) =>
             await _context.Bookings
                 .Include(b => b.Driver)
-                .Include(b => b.RideRequest) // ✅ Fixed: was "Ride"
+                .Include(b => b.RideRequest)
                 .FirstOrDefaultAsync(b => b.Id == bookingId);
 
         public async Task<IEnumerable<Booking>> GetAllAsync() =>
             await _context.Bookings
-                .Include(b => b.RideRequest) // ✅ Fixed
+                .Include(b => b.RideRequest)
                 .Include(b => b.Driver)
                 .ToListAsync();
 
         public async Task<IEnumerable<Booking>> GetByRiderAsync(int riderId, int page, int pageSize) =>
             await _context.Bookings
-                .Include(b => b.RideRequest) // ✅ Fixed
+                .Include(b => b.RideRequest)
                 .Include(b => b.Driver)
-                .Where(b => b.RideRequest.RiderId == riderId) // ✅ Fixed: was "Ride"
+                .Where(b => b.RideRequest.RiderId == riderId)
                 .OrderByDescending(b => b.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
@@ -42,7 +42,7 @@ namespace RideMobility.Api.Repositories.Implementations
         public Task RemoveAsync(Booking booking)
         {
             _context.Bookings.Remove(booking);
-            return Task.CompletedTask; // ✅ fixed signature
+            return Task.CompletedTask;
         }
 
         public async Task SaveChangesAsync() =>

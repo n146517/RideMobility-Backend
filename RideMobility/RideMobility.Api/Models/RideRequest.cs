@@ -24,5 +24,8 @@ namespace RideMobility.Api.Models
         public double DistanceKm { get; set; } = 0;
 
         public bool IsCompleted { get; set; } = false;
+
+        [Required]
+        public VehicleType VehicleType { get; set; } = VehicleType.Car; // Rider's choice
     }
 }

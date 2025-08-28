@@ -30,18 +30,17 @@ namespace RideMobility.Api.Controllers
         {
             if (booking.RideRequestId <= 0)
                 return BadRequest("RideRequestId required");
-
             var rideRequest = await _rideRequestRepo.GetByIdAsync(booking.RideRequestId);
             if (rideRequest == null) return NotFound("Ride request not found");
             if (rideRequest.IsCompleted) return BadRequest("Ride already completed");
 
-            var driver = (await _driverRepo.GetAvailableDriversAsync()).FirstOrDefault();
-            if (driver == null) return BadRequest("No available drivers");
+            var driver = (await _driverRepo.GetAvailableDriversAsync(rideRequest.VehicleType)).FirstOrDefault();
+            if (driver == null) return BadRequest($"No available {rideRequest.VehicleType} drivers");
 
             booking.DriverId = driver.Id;
+            booking.VehicleType = driver.VehicleType;
             booking.Fare = FareCalculator.CalculateFare(rideRequest.DistanceKm);
 
-            // update ride and driver
             rideRequest.IsCompleted = true;
             driver.IsAvailable = false;
 

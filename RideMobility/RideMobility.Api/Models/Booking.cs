@@ -20,6 +20,9 @@ namespace RideMobility.Api.Models
         [ForeignKey("DriverId")]
         public Driver Driver { get; set; }
 
+        [Required]
+        public VehicleType VehicleType { get; set; }
+
         public decimal Fare { get; set; }
     }
 }
